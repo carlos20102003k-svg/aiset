@@ -1,0 +1,11 @@
+- name: Créer un fichier avec un message
+  hosts: clients
+  become: yes
+  tasks:
+    - name: Créer un fichier avec une phrase
+      copy:
+        dest: /home/lamine/message.txt
+        content: "Ceci est un test depuis AWX."
+        owner: lamine
+        group: lamine
+        mode: '0644'
