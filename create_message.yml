@@ -1,5 +1,6 @@
 - name: Créer un fichier avec un message
   hosts: clients
+  become: yes
   tasks:
     - name: Créer un fichier avec une phrase
       copy:
