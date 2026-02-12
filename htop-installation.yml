@@ -1,1 +1,8 @@
-
+- name: Installation htop
+  hosts: clients
+  become: yes
+  tasks:
+    - name: Installer htop
+      apt:
+        name: htop
+        state: present
