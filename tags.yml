@@ -1,22 +1,28 @@
-- name: Playbook avec tags
+- name: Playbook de test
   hosts: clients
   become: yes
   tasks:
 
-    - name: Update
-      apt:
-        update_cache: yes
-        upgrade: dist
-      tags: update
+    - name: Test ping
+      ansible.builtin.ping:
+      tags: ping
 
-    - name: Script A
-      script: scriptA.sh
-      tags: scriptA
+    - name: Message de test
+      debug:
+        msg: "Ceci est un test"
+      tags: test
 
-    - name: Script B
-      script: scriptB.sh
-      tags: scriptB
+    - name: Créer un fichier de test
+      copy:
+        dest: /tmp/test_awx.txt
+        content: "Fichier créé par AWX"
+      tags: fichier
 
-    - name: Script C
-      script: scriptC.sh
-      tags: scriptC
+    - name: Vérifier uptime
+      command: uptime
+      tags: uptime
+
+    - name: Vérifier l'espace disque
+      command: df -h
+      tags: disque
+
