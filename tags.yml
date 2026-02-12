@@ -1,0 +1,17 @@
+- name: Update
+  apt:
+    update_cache: yes
+    upgrade: dist
+  tags: update
+
+- name: Script A
+  script: scriptA.sh
+  tags: scriptA
+
+- name: Script B
+  script: scriptB.sh
+  tags: scriptB
+
+- name: Script C
+  script: scriptC.sh
+  tags: scriptC
