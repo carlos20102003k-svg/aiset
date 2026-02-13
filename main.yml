@@ -1,9 +1,19 @@
-- import_playbook: update&&upgrade.yml
-  tags:
-    - update
-    - upgrade
+- hosts: clients
+  become: yes
 
-- import_playbook: Maintenance.yml
-  tags:
-    - dossier
-    - version
+  tasks:
+
+    - include_tasks: update&&upgrade.yml
+      tags:
+        - update
+        - upgrade
+
+    - include_tasks: Maintenance.yml
+      tags:
+        - ram
+        - version
+        - services
+        - ports
+        - cpu
+        - dossier
+
