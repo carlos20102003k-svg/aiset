@@ -3,13 +3,13 @@
 
   tasks:
 
-    - include_tasks: tasks/update.yml
+    - include_tasks: update.yml
       tags: update
 
-    - include_tasks: tasks/upgrade.yml
+    - include_tasks: upgrade.yml
       tags: upgrade
 
-    - include_tasks: tasks/maintenance.yml
+    - include_tasks: Maintenance.yml
       tags:
         - ram
         - version
