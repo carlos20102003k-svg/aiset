@@ -3,12 +3,13 @@
 
   tasks:
 
-    - include_tasks: update&&upgrade.yml
-      tags:
-        - update
-        - upgrade
+    - include_tasks: tasks/update.yml
+      tags: update
 
-    - include_tasks: Maintenance.yml
+    - include_tasks: tasks/upgrade.yml
+      tags: upgrade
+
+    - include_tasks: tasks/maintenance.yml
       tags:
         - ram
         - version
@@ -16,4 +17,3 @@
         - ports
         - cpu
         - dossier
-
