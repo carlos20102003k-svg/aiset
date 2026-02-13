@@ -5,7 +5,9 @@
     - name: Mettre à jour la liste des paquets
       apt:
         update_cache: yes
+      tags: update  
 
     - name: Installer les mises à jour
       apt:
         upgrade: dist
+      tags: upgrade 
