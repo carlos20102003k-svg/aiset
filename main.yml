@@ -1,5 +1,6 @@
 - import_playbook: update&&upgrade.yml
   tags: update
+  tags: upgrade
 
 - import_playbook: Maintenance.yml
-  tags: upgrade
+  tags: 
