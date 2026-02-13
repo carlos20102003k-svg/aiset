@@ -1,37 +1,25 @@
-- name: Playbook de maintenance basique
-  hosts: clients
-  become: yes
+- name: Vérifier la RAM disponible
+  command: free -h
+  tags: ram
 
-  tasks:
+- name: Vérifier la version du système
+  command: lsb_release -a
+  tags: version
 
-    - name: Vérifier la RAM disponible
-      command: free -h
-      tags: ram
+- name: Vérifier les services actifs
+  command: systemctl list-units --type=service --state=running
+  tags: services
 
-    - name: Vérifier la version du système
-      command: lsb_release -a
-      tags: version
+- name: Vérifier les ports ouverts
+  command: ss -tuln
+  tags: ports
 
-    - name: Vérifier les services actifs
-      command: systemctl list-units --type=service --state=running
-      tags: services
+- name: Vérifier la charge CPU
+  command: cat /proc/loadavg
+  tags: cpu
 
-    - name: Vérifier les ports ouverts
-      command: ss -tuln
-      tags: ports
-
-    - name: Vérifier la charge CPU
-      command: cat /proc/loadavg
-      tags: cpu
-
-    - name: Créer un dossier de maintenance
-      file:
-        path: /tmp/maintenance_awx
-        state: directory
-      tags: dossier
-
-    - name: Ajouter un fichier de log
-      copy:
-        dest: /tmp/maintenance_awx/log.txt
-        content: "Maintenance effectuée par AWX\n"
-      tags: log
+- name: Créer un dossier de maintenance
+  file:
+    path: /tmp/maintenance_awx
+    state: directory
+  tags: dossier
