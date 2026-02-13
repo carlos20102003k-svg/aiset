@@ -5,5 +5,5 @@
 
 - import_playbook: Maintenance.yml
   tags:
-    - ping
-    - test
+    - dossier
+    - version
