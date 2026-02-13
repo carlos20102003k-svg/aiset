@@ -3,4 +3,5 @@
   tags: upgrade
 
 - import_playbook: Maintenance.yml
-  tags: 
+  tags: ping
+  tags: test
