@@ -6,8 +6,7 @@
     - include_tasks: update.yml
       tags: update
 
-    - include_tasks: upgrade.yml
-      tags: upgrade
+    - include_tasks: always.yml
 
     - include_tasks: Maintenance.yml
       tags:
