@@ -1,8 +1,35 @@
-Packages :
-{{ scan_pkg }}
+=== RAPPORT DE SCAN AUTOMATISÉ ===
 
-Services :
-{{ scan_srv }}
+Machine : {{ inventory_hostname }}
+Adresse IP : {{ ansible_default_ipv4.address }}
+OS : {{ ansible_distribution }} {{ ansible_distribution_version }}
 
-Fichiers scannés :
-{{ scan_files }}
+------------------------------------
+PACKAGES
+------------------------------------
+{{ scan_pkg | to_nice_json }}
+
+------------------------------------
+SERVICES
+------------------------------------
+{{ scan_srv | to_nice_json }}
+
+------------------------------------
+FICHIERS SCANNÉS
+------------------------------------
+{% if scan_files is defined %}
+{{ scan_files | to_nice_json }}
+{% else %}
+Aucun scan de fichiers effectué.
+{% endif %}
+
+------------------------------------
+INSIGHTS MACHINE ID
+------------------------------------
+{% if scan_insights_id is defined %}
+{{ scan_insights_id | to_nice_json }}
+{% else %}
+Non disponible.
+{% endif %}
+
+=== FIN DU RAPPORT ===
