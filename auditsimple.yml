@@ -25,6 +25,13 @@
           Hôte : {{ inventory_hostname }}
           OS : {{ ansible_distribution }} {{ ansible_distribution_version }}
           Adresse IP : {{ ansible_default_ipv4.address }}
+          Date : {{ ansible_date_time.date }}
+          Heure : {{ ansible_date_time.time }}
+          Fichier OS : {{ ansible_distribution_file_path }}
+          nom os : {{ ansible_distribution }} 
+          version de l'os : {{ ansible_distribution_version }}
+          la version du noyau Linux : {{ ansible_kernel }}
+
 
           --- SERVICES ---
           {{ ansible_facts.services | to_nice_json }}
