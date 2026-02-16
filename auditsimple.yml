@@ -1,6 +1,6 @@
 ---
 - name: Audit système simple
-  hosts: all
+  hosts: clients
   gather_facts: yes
   become: yes
 
@@ -24,6 +24,7 @@
 
           Hôte : {{ inventory_hostname }}
           OS : {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Adresse IP : {{ ansible_default_ipv4.address }}
 
           --- SERVICES ---
           {{ ansible_facts.services | to_nice_json }}
