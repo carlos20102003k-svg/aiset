@@ -1,0 +1,7 @@
+---
+- name: Audit de sécurité Linux (DevSec)
+  hosts: all
+  become: yes
+
+  roles:
+    - devsec.hardening.linux_baseline
