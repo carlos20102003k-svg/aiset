@@ -1,0 +1,35 @@
+---
+- name: Audit système simple
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  tasks:
+
+    - name: Récupérer les services
+      service_facts:
+
+    - name: Récupérer les packages installés
+      package_facts:
+
+    - name: Récupérer les ports ouverts
+      command: ss -tuln
+      register: ports
+
+    - name: Générer un rapport
+      copy:
+        dest: /tmp/audit_report.txt
+        content: |
+          === AUDIT SYSTÈME ===
+
+          Hôte : {{ inventory_hostname }}
+          OS : {{ ansible_distribution }} {{ ansible_distribution_version }}
+
+          --- SERVICES ---
+          {{ ansible_facts.services | to_nice_json }}
+
+          --- PACKAGES ---
+          {{ ansible_facts.packages | to_nice_json }}
+
+          --- PORTS OUVERTS ---
+          {{ ports.stdout }}
