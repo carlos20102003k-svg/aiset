@@ -1,0 +1,6 @@
+- name:ecrire le hostname
+  hosts: clients
+  tasks:
+    - name : hostname
+      src: test.j2
+      dst: /tmp/hostname
