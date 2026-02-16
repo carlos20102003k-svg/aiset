@@ -1,35 +1,58 @@
-- hosts: all
+---
+- name: Scan complet Linux/Windows + génération rapport
+  hosts: cients
   vars:
     scan_use_checksum: false
     scan_use_recursive: false
+
   tasks:
 
-    - name: "Scan packages (Unix/Linux)"
+    # --- SCAN LINUX ---
+    - name: Scan packages (Linux)
       scan_packages:
         os_family: '{{ ansible_os_family }}'
+      register: scan_pkg
       when: ansible_os_family != "Windows"
-    - name: "Scan services (Unix/Linux)"
+
+    - name: Scan services (Linux)
       scan_services:
+      register: scan_srv
       when: ansible_os_family != "Windows"
-    - name: "Scan files (Unix/Linux)"
+
+    - name: Scan files (Linux)
       scan_files:
         paths: '{{ scan_file_paths }}'
         get_checksum: '{{ scan_use_checksum }}'
         recursive: '{{ scan_use_recursive }}'
+      register: scan_files
       when: scan_file_paths is defined and ansible_os_family != "Windows"
-    - name: "Scan Insights for Machine ID (Unix/Linux)"
+
+    - name: Scan Insights Machine ID (Linux)
       scan_insights:
+      register: scan_insights_id
       when: ansible_os_family != "Windows"
 
-    - name: "Scan packages (Windows)"
+    # --- SCAN WINDOWS ---
+    - name: Scan packages (Windows)
       win_scan_packages:
+      register: scan_pkg
       when: ansible_os_family == "Windows"
-    - name: "Scan services (Windows)"
+
+    - name: Scan services (Windows)
       win_scan_services:
+      register: scan_srv
       when: ansible_os_family == "Windows"
-    - name: "Scan files (Windows)"
+
+    - name: Scan files (Windows)
       win_scan_files:
         paths: '{{ scan_file_paths }}'
         get_checksum: '{{ scan_use_checksum }}'
         recursive: '{{ scan_use_recursive }}'
+      register: scan_files
       when: scan_file_paths is defined and ansible_os_family == "Windows"
+
+    # --- GENERATION DU RAPPORT ---
+    - name: Générer un rapport de scan
+      ansible.builtin.template:
+        src: templates/report.j2
+        dest: /tmp/scan_report.txt
