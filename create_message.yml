@@ -1,5 +1,5 @@
 - name: Créer un fichier avec un message
-  hosts: clients
+  hosts: goupe teste clients
   become: yes
   tasks:
     - name: Créer un fichier avec une phrase
