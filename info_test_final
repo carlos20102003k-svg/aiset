@@ -1,1 +1,113 @@
+---
+- name: Audit système complet
+  hosts: goupe_teste_clients
+  gather_facts: yes
+  become: yes
+
+  tasks:
+
+    - name: Générer un rapport d'audit
+      copy:
+        dest: /tmp/audit_report.txt
+        mode: '0644'
+        content: |
+          ============================
+          === AUDIT SYSTÈME COMPLET ===
+          ============================
+
+          Hôte : {{ inventory_hostname }}
+          OS : {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Noyau : {{ ansible_kernel }}
+          Adresse IP : {{ ansible_default_ipv4.address }}
+          Date : {{ ansible_date_time.date }}
+          Heure : {{ ansible_date_time.time }}
+          Fichier OS : {{ ansible_distribution_file_path }}
+
+          ============================
+          === INFOS SYSTÈME ==========
+          ============================
+
+          --- hostnamectl ---
+          {{ lookup('pipe', 'hostnamectl') }}
+
+          --- uname -a ---
+          {{ lookup('pipe', 'uname -a') }}
+
+          ============================
+          === RÉSEAU =================
+          ============================
+
+          --- Interfaces ---
+          {{ lookup('pipe', 'ip -brief address') }}
+
+          --- DNS ---
+          {{ lookup('pipe', 'cat /etc/resolv.conf') }}
+
+          --- Ports & connexions actives ---
+          {{ lookup('pipe', 'ss -tulpan') }}
+
+          --- Firewall ---
+          {{ lookup('pipe', 'iptables -L -n -V') }}
+
+          --- Routes ---
+          {{ lookup('pipe', 'ip route') }}
+
+          ============================
+          === SERVICES ===============
+          ============================
+
+          --- Services en échec ---
+          {{ lookup('pipe', 'systemctl --type=service --state=failed') }}
+
+          --- Services masqués ---
+          {{ lookup('pipe', 'systemctl list-unit-files --type=service --state=masked') }}
+
+          --- Services activés ---
+          {{ lookup('pipe', 'systemctl list-unit-files --type=service --state=enabled') }}
+
+          ============================
+          === MATÉRIEL ===============
+          ============================
+
+          --- CPU ---
+          {{ lookup('pipe', 'lscpu | grep -E \"^CPU\\\\(s\\\\):|^Vendor ID:|^Model name:|^BIOS Model name:\"') }}
+
+          --- RAM ---
+          {{ lookup('pipe', 'free -h') }}
+
+          --- USB ---
+          {{ lookup('pipe', 'lsusb') }}
+
+          ============================
+          === STOCKAGE ===============
+          ============================
+
+          --- Disques & partitions ---
+          {{ lookup('pipe', 'lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT') }}
+
+          --- Espace disque ---
+          {{ lookup('pipe', 'df -h') }}
+
+          ============================
+          === SÉCURITÉ ===============
+          ============================
+
+          --- Nombre d'utilisateurs ---
+          {{ lookup('pipe', 'cut -d: -f1 /etc/passwd | wc -l') }}
+
+          --- Utilisateurs + shell + UID ---
+          {{ lookup('pipe', "awk -F: '{print $1, $7, $3}' /etc/passwd") }}
+
+          --- Cron ---
+          {{ lookup('pipe', 'ls /etc/cron.*') }}
+
+          --- Ports exposés ---
+          {{ lookup('pipe', 'ss -tulpan | grep LISTEN') }}
+
+          ============================
+          === LOGS ===================
+          ============================
+
+          --- Logs importants (24h) ---
+          {{ lookup('pipe', 'journalctl -p err --since \"1 day ago\"') }}
 
