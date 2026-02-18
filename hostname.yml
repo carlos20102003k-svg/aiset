@@ -1,5 +1,5 @@
 - name: ecrire le hostname
-  hosts: clients
+  hosts: all
   tasks:
     - name : hostname
       ansible.builtin.template:
