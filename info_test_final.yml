@@ -6,7 +6,127 @@
 
   tasks:
 
-    - name: Générer un rapport d'audit
+    ########################################
+    # INFOS SYSTÈME
+    ########################################
+
+    - name: hostnamectl
+      command: hostnamectl
+      register: hostnamectl_out
+
+    - name: uname
+      command: uname -a
+      register: uname_out
+
+    ########################################
+    # RÉSEAU
+    ########################################
+
+    - name: Interfaces réseau
+      command: ip -brief address
+      register: interfaces_out
+
+    - name: DNS
+      command: cat /etc/resolv.conf
+      register: dns_out
+
+    - name: Ports & connexions actives
+      command: ss -tulpan
+      register: ss_out
+
+    - name: Firewall
+      command: iptables -L -n -V
+      register: firewall_out
+      ignore_errors: yes
+
+    - name: Routes
+      command: ip route
+      register: routes_out
+
+    ########################################
+    # SERVICES
+    ########################################
+
+    - name: Services failed
+      command: systemctl --type=service --state=failed
+      register: failed_services
+      ignore_errors: yes
+
+    - name: Services masked
+      command: systemctl list-unit-files --type=service --state=masked
+      register: masked_services
+      ignore_errors: yes
+
+    - name: Services enabled
+      command: systemctl list-unit-files --type=service --state=enabled
+      register: enabled_services
+      ignore_errors: yes
+
+    ########################################
+    # MATÉRIEL
+    ########################################
+
+    - name: CPU info
+      command: bash -c "lscpu | grep -E '^CPU\\(s\\):|^Vendor ID:|^Model name:|^BIOS Model name:'"
+      register: cpu_out
+
+    - name: RAM
+      command: free -h
+      register: ram_out
+
+    - name: USB
+      command: lsusb
+      register: usb_out
+      ignore_errors: yes
+
+    ########################################
+    # STOCKAGE
+    ########################################
+
+    - name: Disques & partitions
+      command: lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT
+      register: lsblk_out
+
+    - name: Espace disque
+      command: df -h
+      register: df_out
+
+    ########################################
+    # SÉCURITÉ
+    ########################################
+
+    - name: Nombre d'utilisateurs
+      command: bash -c "cut -d: -f1 /etc/passwd | wc -l"
+      register: user_count
+
+    - name: Liste utilisateurs
+      command: bash -c "awk -F: '{print $1, $7, $3}' /etc/passwd"
+      register: users_out
+
+    - name: Cron
+      command: ls /etc/cron.*
+      register: cron_out
+      ignore_errors: yes
+
+    - name: Ports exposés
+      command: bash -c "ss -tulpan | grep LISTEN"
+      register: ports_exposed
+      ignore_errors: yes
+
+    ########################################
+    # LOGS
+    ########################################
+
+    - name: Logs importants (24h)
+      command: bash -c "journalctl -p err --since '1 day ago'"
+      register: logs_out
+      ignore_errors: yes
+
+    ########################################
+    # GÉNÉRATION DU RAPPORT FINAL
+    ########################################
+
+    - name: Générer le rapport d'audit
       copy:
         dest: /tmp/audit_report.txt
         mode: '0644'
@@ -21,93 +141,91 @@
           Adresse IP : {{ ansible_default_ipv4.address }}
           Date : {{ ansible_date_time.date }}
           Heure : {{ ansible_date_time.time }}
-          Fichier OS : {{ ansible_distribution_file_path }}
 
           ============================
           === INFOS SYSTÈME ==========
           ============================
 
           --- hostnamectl ---
-          {{ lookup('pipe', 'hostnamectl') }}
+          {{ hostnamectl_out.stdout }}
 
           --- uname -a ---
-          {{ lookup('pipe', 'uname -a') }}
+          {{ uname_out.stdout }}
 
           ============================
           === RÉSEAU =================
           ============================
 
           --- Interfaces ---
-          {{ lookup('pipe', 'ip -brief address') }}
+          {{ interfaces_out.stdout }}
 
           --- DNS ---
-          {{ lookup('pipe', 'cat /etc/resolv.conf') }}
+          {{ dns_out.stdout }}
 
-          --- Ports & connexions actives ---
-          {{ lookup('pipe', 'ss -tulpan') }}
+          --- Ports & connexions ---
+          {{ ss_out.stdout }}
 
           --- Firewall ---
-          {{ lookup('pipe', 'iptables -L -n -V') }}
+          {{ firewall_out.stdout }}
 
           --- Routes ---
-          {{ lookup('pipe', 'ip route') }}
+          {{ routes_out.stdout }}
 
           ============================
           === SERVICES ===============
           ============================
 
-          --- Services en échec ---
-          {{ lookup('pipe', 'systemctl --type=service --state=failed') }}
+          --- Services failed ---
+          {{ failed_services.stdout }}
 
-          --- Services masqués ---
-          {{ lookup('pipe', 'systemctl list-unit-files --type=service --state=masked') }}
+          --- Services masked ---
+          {{ masked_services.stdout }}
 
-          --- Services activés ---
-          {{ lookup('pipe', 'systemctl list-unit-files --type=service --state=enabled') }}
+          --- Services enabled ---
+          {{ enabled_services.stdout }}
 
           ============================
           === MATÉRIEL ===============
           ============================
 
           --- CPU ---
-          {{ lookup('pipe', 'lscpu | grep -E \"^CPU\\\\(s\\\\):|^Vendor ID:|^Model name:|^BIOS Model name:\"') }}
+          {{ cpu_out.stdout }}
 
           --- RAM ---
-          {{ lookup('pipe', 'free -h') }}
+          {{ ram_out.stdout }}
 
           --- USB ---
-          {{ lookup('pipe', 'lsusb') }}
+          {{ usb_out.stdout }}
 
           ============================
           === STOCKAGE ===============
           ============================
 
           --- Disques & partitions ---
-          {{ lookup('pipe', 'lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT') }}
+          {{ lsblk_out.stdout }}
 
           --- Espace disque ---
-          {{ lookup('pipe', 'df -h') }}
+          {{ df_out.stdout }}
 
           ============================
           === SÉCURITÉ ===============
           ============================
 
           --- Nombre d'utilisateurs ---
-          {{ lookup('pipe', 'cut -d: -f1 /etc/passwd | wc -l') }}
+          {{ user_count.stdout }}
 
-          --- Utilisateurs + shell + UID ---
-          {{ lookup('pipe', "awk -F: '{print $1, $7, $3}' /etc/passwd") }}
+          --- Utilisateurs ---
+          {{ users_out.stdout }}
 
           --- Cron ---
-          {{ lookup('pipe', 'ls /etc/cron.*') }}
+          {{ cron_out.stdout }}
 
           --- Ports exposés ---
-          {{ lookup('pipe', 'ss -tulpan | grep LISTEN') }}
+          {{ ports_exposed.stdout }}
 
           ============================
           === LOGS ===================
           ============================
 
           --- Logs importants (24h) ---
-          {{ lookup('pipe', 'journalctl -p err --since \"1 day ago\"') }}
-
+          {{ logs_out.stdout }}
