@@ -1,6 +1,6 @@
 ---
 - name: Audit système simple
-  hosts: clients
+  hosts: goupe_teste_clients
   gather_facts: yes
   become: yes
 
