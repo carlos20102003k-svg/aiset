@@ -67,7 +67,8 @@
     ########################################
 
     - name: CPU info
-      command: bash -c "lscpu | grep -E '^CPU\\(s\\):|^Vendor ID:|^Model name:|^BIOS Model name:'"
+      command: >
+        bash -c "lscpu | grep -E '^CPU\\(s\\):|^Vendor ID:|^Model name:|^BIOS Model name:'"
       register: cpu_out
 
     - name: RAM
@@ -96,11 +97,13 @@
     ########################################
 
     - name: Nombre d'utilisateurs
-      command: bash -c "cut -d: -f1 /etc/passwd | wc -l"
+      command: >
+        bash -c "cut -d':' -f1 /etc/passwd | wc -l"
       register: user_count
 
     - name: Liste utilisateurs
-      command: bash -c "awk -F: '{print $1, $7, $3}' /etc/passwd"
+      command: >
+        bash -c "awk -F':' '{print $1, $7, $3}' /etc/passwd"
       register: users_out
 
     - name: Cron
@@ -109,7 +112,8 @@
       ignore_errors: yes
 
     - name: Ports exposés
-      command: bash -c "ss -tulpan | grep LISTEN"
+      command: >
+        bash -c "ss -tulpan | grep LISTEN"
       register: ports_exposed
       ignore_errors: yes
 
@@ -118,7 +122,8 @@
     ########################################
 
     - name: Logs importants (24h)
-      command: bash -c "journalctl -p err --since '1 day ago'"
+      command: >
+        bash -c "journalctl -p err --since '1 day ago'"
       register: logs_out
       ignore_errors: yes
 
