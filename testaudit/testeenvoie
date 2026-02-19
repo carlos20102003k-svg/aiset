@@ -1,0 +1,253 @@
+---
+- name: Audit système complet
+  hosts: goupe_teste_clients
+  gather_facts: yes
+  become: yes
+
+  tasks:
+
+    ########################################
+    # INFOS SYSTÈME
+    ########################################
+
+    - name: hostnamectl
+      command: hostnamectl
+      register: hostnamectl_out
+
+    - name: uname
+      command: uname -a
+      register: uname_out
+
+    ########################################
+    # RÉSEAU
+    ########################################
+
+    - name: Interfaces réseau
+      command: ip -brief address
+      register: interfaces_out
+
+    - name: DNS
+      command: cat /etc/resolv.conf
+      register: dns_out
+
+    - name: Ports & connexions actives
+      command: ss -tulpan
+      register: ss_out
+
+    - name: Firewall
+      command: iptables -L -n -V
+      register: firewall_out
+      ignore_errors: yes
+
+    - name: Routes
+      command: ip route
+      register: routes_out
+
+    ########################################
+    # SERVICES
+    ########################################
+
+    - name: Services failed
+      command: systemctl --type=service --state=failed
+      register: failed_services
+      ignore_errors: yes
+
+    - name: Services masked
+      command: systemctl list-unit-files --type=service --state=masked
+      register: masked_services
+      ignore_errors: yes
+
+    - name: Services enabled
+      command: systemctl list-unit-files --type=service --state=enabled
+      register: enabled_services
+      ignore_errors: yes
+
+    ########################################
+    # MATÉRIEL
+    ########################################
+
+    - name: CPU info
+      command: >
+        bash -c "lscpu | grep -E '^CPU\\(s\\):|^Vendor ID:|^Model name:|^BIOS Model name:'"
+      register: cpu_out
+
+    - name: RAM
+      command: free -h
+      register: ram_out
+
+    - name: USB
+      command: lsusb
+      register: usb_out
+      ignore_errors: yes
+
+    ########################################
+    # STOCKAGE
+    ########################################
+
+    - name: Disques & partitions
+      command: lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT
+      register: lsblk_out
+
+    - name: Espace disque
+      command: df -h
+      register: df_out
+
+    ########################################
+    # SÉCURITÉ
+    ########################################
+
+    - name: Nombre d'utilisateurs
+      command: >
+        bash -c "cut -d':' -f1 /etc/passwd | wc -l"
+      register: user_count
+
+    - name: Liste utilisateurs
+      command: >
+        bash -c "awk -F':' '{print $1, $7, $3}' /etc/passwd"
+      register: users_out
+
+    - name: Cron
+      command: ls /etc/cron.*
+      register: cron_out
+      ignore_errors: yes
+
+    - name: Ports exposés
+      command: >
+        bash -c "ss -tulpan | grep LISTEN"
+      register: ports_exposed
+      ignore_errors: yes
+
+    ########################################
+    # LOGS
+    ########################################
+
+    - name: Logs importants (24h)
+      command: >
+        bash -c "journalctl -p err --since '1 day ago'"
+      register: logs_out
+      ignore_errors: yes
+
+    ########################################
+    # GÉNÉRATION DU RAPPORT FINAL
+    ########################################
+
+    - name: Générer le rapport d'audit
+      copy:
+        dest: /tmp/audit_report.txt
+        mode: '0644'
+        content: |
+          ============================
+          === AUDIT SYSTÈME COMPLET ===
+          ============================
+
+          Hôte : {{ inventory_hostname }}
+          OS : {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Noyau : {{ ansible_kernel }}
+          Adresse IP : {{ ansible_default_ipv4.address }}
+          Date : {{ ansible_date_time.date }}
+          Heure : {{ ansible_date_time.time }}
+
+          ============================
+          === INFOS SYSTÈME ==========
+          ============================
+
+          --- hostnamectl ---
+          {{ hostnamectl_out.stdout }}
+
+          --- uname -a ---
+          {{ uname_out.stdout }}
+
+          ============================
+          === RÉSEAU =================
+          ============================
+
+          --- Interfaces ---
+          {{ interfaces_out.stdout }}
+
+          --- DNS ---
+          {{ dns_out.stdout }}
+
+          --- Ports & connexions ---
+          {{ ss_out.stdout }}
+
+          --- Firewall ---
+          {{ firewall_out.stdout }}
+
+          --- Routes ---
+          {{ routes_out.stdout }}
+
+          ============================
+          === SERVICES ===============
+          ============================
+
+          --- Services failed ---
+          {{ failed_services.stdout }}
+
+          --- Services masked ---
+          {{ masked_services.stdout }}
+
+          --- Services enabled ---
+          {{ enabled_services.stdout }}
+
+          ============================
+          === MATÉRIEL ===============
+          ============================
+
+          --- CPU ---
+          {{ cpu_out.stdout }}
+
+          --- RAM ---
+          {{ ram_out.stdout }}
+
+          --- USB ---
+          {{ usb_out.stdout }}
+
+          ============================
+          === STOCKAGE ===============
+          ============================
+
+          --- Disques & partitions ---
+          {{ lsblk_out.stdout }}
+
+          --- Espace disque ---
+          {{ df_out.stdout }}
+
+          ============================
+          === SÉCURITÉ ===============
+          ============================
+
+          --- Nombre d'utilisateurs ---
+          {{ user_count.stdout }}
+
+          --- Utilisateurs ---
+          {{ users_out.stdout }}
+
+          --- Cron ---
+          {{ cron_out.stdout }}
+
+          --- Ports exposés ---
+          {{ ports_exposed.stdout }}
+
+          ============================
+          === LOGS ===================
+          ============================
+
+          --- Logs importants (24h) ---
+          {{ logs_out.stdout }}
+
+    ########################################
+    # ENVOI DU RAPPORT PAR EMAIL
+    ########################################
+
+    - name: Envoyer le rapport d'audit par email
+      mail:
+        host: smtp.gmail.com
+        port: 587
+        username: "{{ smtp_user }}"
+        password: "{{ smtp_pass }}"
+        to: "jeuxtest440@gmail.com"
+        subject: "Rapport d'audit - {{ inventory_hostname }}"
+        body: "Voici le rapport généré automatiquement."
+        attach:
+          - /tmp/audit_report.txt
+        secure: starttls
