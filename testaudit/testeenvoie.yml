@@ -245,7 +245,7 @@
         port: 587
         username: "{{ smtp_user }}"
         password: "{{ smtp_pass }}"
-        to: "carlos20102003K@gmail.com"
+        to: "jeuxtest440@gmail.com"
         subject: "Rapport d'audit - {{ inventory_hostname }}"
         body: "Voici le rapport généré automatiquement."
         attach:
