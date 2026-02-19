@@ -240,7 +240,7 @@
     ########################################
 
     - name: Envoyer le rapport d'audit par email
-      mail:
+      community.general.mail:
         host: smtp.gmail.com
         port: 587
         username: "{{ smtp_user }}"
