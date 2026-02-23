@@ -4,7 +4,7 @@
 
   vars:
     username: "user01"
-    my_public_key: "ssh-rsa {{ ssh_key | replace('\n', '') }} jeankey"
+    my_public_key: "ssh-rsa {{ ssh_key | regex_replace('\\s+', '') }} jeankey"
 
   tasks:
     - name: Créer l'utilisateur s'il n'existe pas
