@@ -1,0 +1,27 @@
+- name: Gestion des clés SSH
+  hosts: all
+  become: yes
+
+  vars:
+    username: "user01"
+
+  tasks:
+
+    - name: Lire le fichier authorized_keys
+      slurp:
+        src: "/home/{{ username }}/.ssh/authorized_keys"
+      register: keys_raw
+
+    - name: Convertir en texte + découper en lignes
+      set_fact:
+        keys_list: "{{ keys_raw.content | b64decode | split('\n') | reject('equalto', '') | list }}"
+
+    - name: Afficher les clés trouvées (debug)
+      debug:
+        var: keys_list
+
+    - name: Supprimer la clé choisie
+      authorized_key:
+        user: "{{ username }}"
+        key: "{{ key_to_remove }}"
+        state: absent
