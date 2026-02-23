@@ -1,1 +1,39 @@
 
+vars:
+  username: "user01"
+
+  raw_key: |
+    AAAAB3NzaC1yc2EAAAADAQABAAABAQDE0Fnfvp/6zXmY18ufIGHzPfhljnL7LFxe
+    Nm4wUnTxClCA3KI8EVO0v6bzuxf6SWvgNJ1WcuTBasceQksI9ku
+    Hu4MZkn3vfhWeFX+nn2IbqnU22ZkPXF7CJFatesiVq4iOy1HbAg6QUntxwwvin7l
+    QAu9Zhwh9dXDufhRVJC3hBJtVTGeuP0ieofqOuy8cSE0V2Bs0Mv1b6XCfwSLUn6X
+    IXV/jysrsCI/wJcBkq3A+x52CSfjV/osPx7XdTRd/T1xnlktca0SGi3doPQ7Jp/o
+    gMAWDiMC9p7LA7aGLP+tY4bC9Ldeu325Worhy0nywypBLHQO4KmP
+  ##en fonction du type de cle##  
+#RSA=ssh-rsa
+#ED25519=ssh-ed25519
+#ECDSA=ecdsa-sha2-nistp256
+#DSA (ancien)=ssh-dss
+  my_public_key: "ssh-rsa {{ raw_key | replace('\n', '') }} jeankey"
+
+tasks:
+  - name: Créer l'utilisateur s'il n'existe pas
+    user:
+      name: "{{ username }}"
+      shell: /bin/bash
+      create_home: yes
+      state: present
+
+  - name: Créer le dossier .ssh si absent
+    file:
+      path: "/home/{{ username }}/.ssh"
+      state: directory
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: '0700'
+
+  - name: Ajouter la clé publique dans authorized_keys
+    authorized_key:
+      user: "{{ username }}"
+      state: present
+      key: "{{ my_public_key }}"
