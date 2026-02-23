@@ -1,5 +1,5 @@
 - name: Gestion des clés SSH
-  hosts: all
+  hosts: 192.168.100.161
   become: yes
 
   vars:
