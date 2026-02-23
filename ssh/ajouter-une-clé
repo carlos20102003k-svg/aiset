@@ -1,4 +1,4 @@
-- name: Création utilisateur + clé SSH
+- name: Ajouter une clé ssh
   hosts: 192.168.100.161
   become: yes
     vars:
