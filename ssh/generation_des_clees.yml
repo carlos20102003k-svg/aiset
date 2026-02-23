@@ -13,7 +13,8 @@
     - name: Installer OpenSSH client et server
       package:
         name:
-          - openssh
+          - openssh-server 
+          - openssh-client
         state: present
 
     # 1️⃣ Créer l'utilisateur
