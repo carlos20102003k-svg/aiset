@@ -14,7 +14,7 @@
       gMAWDiMC9p7LA7aGLP+tY4bC9Ldeu325Worhy0nywypBLHQO4KmP
 
     ##Type de clé :## 
-    #RSA → ssh-rsa
+    #RSA=ssh-rsa
     #ED25519=ssh-ed25519
     #ECDSA=ecdsa-sha2-nistp256
     #DSA (ancien)= ssh-dss
