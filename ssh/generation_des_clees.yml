@@ -34,7 +34,7 @@
 
     # 3️⃣ Générer la paire de clés SSH
     - name: Générer une paire de clés SSH
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: "/home/{{ username }}/.ssh/id_ed25519"
         type: ed25519
         owner: "{{ username }}"
