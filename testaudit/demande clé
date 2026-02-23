@@ -1,0 +1,29 @@
+- name: Ajouter une clé ssh
+  hosts: 192.168.100.161
+  become: yes
+
+  vars:
+    username: "user01"
+    my_public_key: "ssh-rsa {{ ssh_key | replace('\n', '') }} jeankey"
+
+  tasks:
+    - name: Créer l'utilisateur s'il n'existe pas
+      user:
+        name: "{{ username }}"
+        shell: /bin/bash
+        create_home: yes
+        state: present
+
+    - name: Créer le dossier .ssh si absent
+      file:
+        path: "/home/{{ username }}/.ssh"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0700'
+
+    - name: Ajouter la clé publique dans authorized_keys
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ my_public_key }}"
