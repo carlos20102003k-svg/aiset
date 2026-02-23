@@ -1,0 +1,77 @@
+---
+- name: Création utilisateur + clé SSH
+  hosts: all
+  become: yes
+
+  vars:
+    username: "user01"
+    expire_date: "2026-03-01"
+
+  tasks:
+
+    # 0️⃣ Installer OpenSSH si absent
+    - name: Installer OpenSSH client et server
+      package:
+        name:
+          - openssh
+        state: present
+
+    # 1️⃣ Créer l'utilisateur
+    - name: Créer l'utilisateur
+      user:
+        name: "{{ username }}"
+        shell: /bin/bash
+        create_home: yes
+
+    # 2️⃣ Créer le dossier .ssh
+    - name: Créer le dossier .ssh
+      file:
+        path: "/home/{{ username }}/.ssh"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0700'
+
+    # 3️⃣ Générer la paire de clés SSH
+    - name: Générer une paire de clés SSH
+      openssh_keypair:
+        path: "/home/{{ username }}/.ssh/id_ed25519"
+        type: ed25519
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0600'
+        comment: "{{ username }}-expire-{{ expire_date + ' 00:00:00' }}"
+        passphrase: ""
+
+    # 4️⃣ Lire la clé publique générée (depuis la machine distante)
+    - name: Lire la clé publique générée
+      slurp:
+        src: "/home/{{ username }}/.ssh/id_ed25519.pub"
+      register: pubkey
+
+    # 5️⃣ Ajouter la clé publique dans authorized_keys
+    - name: Ajouter la clé publique dans authorized_keys
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ pubkey.content | b64decode }}"
+
+    # 6️⃣ Envoyer les clés SSH par email
+    - name: Envoyer les clés SSH par email
+      community.general.mail:
+        host: smtp.gmail.com
+        port: 587
+        username: "{{ smtp_user }}"
+        password: "{{ smtp_pass }}"
+        to: "jeuxtest440@gmail.com"
+        subject: "Clés SSH générées - {{ inventory_hostname }}"
+        body: |
+          Voici les clés SSH générées automatiquement pour l'utilisateur {{ username }}.
+          - id_ed25519  (clé privée)
+          - id_ed25519.pub (clé publique)
+
+          ⚠️ Attention : la clé privée doit rester confidentielle.
+        attach:
+          - "/home/{{ username }}/.ssh/id_ed25519"
+          - "/home/{{ username }}/.ssh/id_ed25519.pub"
+        secure: starttls
