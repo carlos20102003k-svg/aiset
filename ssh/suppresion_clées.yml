@@ -1,21 +1,13 @@
-- name: Lire les clés SSH
-  hosts: all
+- name: Supprimer une clé SSH
+  hosts: 192.168.100.161
   become: yes
 
   vars:
     username: "user01"
 
   tasks:
-    - name: Lire authorized_keys
-      slurp:
-        src: "/home/{{ username }}/.ssh/authorized_keys"
-      register: keys_raw
-
-    - name: Convertir en liste
-      set_fact:
-        keys_list: "{{ keys_raw.content | b64decode | split('\n') | reject('equalto','') | list }}"
-
-    - name: Exporter la liste pour le workflow
-      set_stats:
-        data:
-          ssh_keys_available: "{{ keys_list }}"
+    - name: Supprimer la clé publique dans authorized_keys
+      authorized_key:
+        user: "{{ username }}"
+        state: absent
+        key: "{{ cle_a_supprimer }}"
