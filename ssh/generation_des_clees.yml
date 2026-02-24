@@ -1,6 +1,6 @@
 ---
 - name: Création utilisateur + clé SSH
-  hosts: groupe-ssh
+  hosts: groupe-ssh2
   become: yes
 
   vars:
