@@ -14,6 +14,14 @@
         key: "{{ cle_a_supprimer }}"
         path: "/home/{{ username }}/.ssh/authorized_keys"
 
+    # 🔒 Remettre les droits corrects sur le HOME
+    - name: HOME appartient à l'utilisateur mais non destructible
+      file:
+        path: "/home/{{ username }}"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0755'
+
     # 🔒 Resécuriser le dossier .ssh
     - name: Mettre root propriétaire du dossier .ssh
       file:
