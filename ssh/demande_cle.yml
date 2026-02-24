@@ -19,8 +19,8 @@
         create_home: yes
         state: present
 
-    # 🔒 Sécurisation du HOME pour empêcher la suppression de .ssh
-    - name: Sécuriser le home pour empêcher la suppression de .ssh
+    # 🔒 home appartient username
+    - name: home appartient username
       file:
         path: "/home/{{ username }}"
         owner: "{{ username }}"
