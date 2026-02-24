@@ -1,0 +1,6 @@
+- name: Choisir action
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - debug:
+        msg: "Action choisie : {{ action }}"
