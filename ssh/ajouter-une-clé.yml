@@ -15,7 +15,7 @@
       #gMAWDiMC9p7LA7aGLP+tY4bC9Ldeu325Worhy0nywypBLHQO4KmP
     
     ## Méthode sur une seule ligne
-    single_line_key: "AAAAB3NzaC1yc2EAAAADAQABAAABAQDE0Fnfvp/6zXmY18ufIGHzPfhljnL7LFxeNm4wUnTxClCA3KI8EVO0v6bzuxf6SWvgNJ1WcuTBasceQksI9vRFIwwkyYLCo9kuHu4MZkn3vfhWeFX+nn2IbqnU22ZkPXF7CJFatesiVq4iOy1HbAg6QUntxwwvin7lQAu9Zhwh9dXDufhRVJC3hBJtVTGeuP0ieofqOuy8cSE0V2Bs0Mv1b6XCfwSLUn6XIXV/jysrsCI/wJcBkq3A+x52CSfjV/osPx7XdTRd/T1xnlktca0SGi3doPQ7Jp/ogMAWDiMC9p7LA7aGLP+tY4bC9Ldeu325Worhy0nywypBLHQO4KmP"
+    single_line_key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDE0Fnfvp/6zXmY18ufIGHzPfhljnL7LFxeNm4wUnTxClCA3KI8EVO0v6bzuxf6SWvgNJ1WcuTBasceQksI9vRFIwwkyYLCo9kuHu4MZkn3vfhWeFX+nn2IbqnU22ZkPXF7CJFatesiVq4iOy1HbAg6QUntxwwvin7lQAu9Zhwh9dXDufhRVJC3hBJtVTGeuP0ieofqOuy8cSE0V2Bs0Mv1b6XCfwSLUn6XIXV/jysrsCI/wJcBkq3A+x52CSfjV/osPx7XdTRd/T1xnlktca0SGi3doPQ7Jp/ogMAWDiMC9p7LA7aGLP+tY4bC9Ldeu325Worhy0nywypBLHQO4KmP
 
     ## Choix de la clé utilisée
     my_public_key: "ssh-rsa {{ single_line_key }} jeankey"
