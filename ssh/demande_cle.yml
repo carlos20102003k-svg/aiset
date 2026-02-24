@@ -34,6 +34,7 @@
         owner: "{{ username }}"
         group: "{{ username }}"
         mode: '0700'
+        force: yes
 
     - name: Ajouter la clé publique dans authorized_keys
       authorized_key:
