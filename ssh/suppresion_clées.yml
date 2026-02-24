@@ -13,3 +13,19 @@
         state: absent
         key: "{{ cle_a_supprimer }}"
         path: "/home/{{ username }}/.ssh/authorized_keys"
+
+    # 🔒 Resécuriser le dossier .ssh
+    - name: Mettre root propriétaire du dossier .ssh
+      file:
+        path: "/home/{{ username }}/.ssh"
+        owner: root
+        group: root
+        mode: '0755'
+
+    # 🔒 Resécuriser le fichier authorized_keys
+    - name: Mettre root propriétaire du fichier authorized_keys
+      file:
+        path: "/home/{{ username }}/.ssh/authorized_keys"
+        owner: root
+        group: root
+        mode: '0644'
