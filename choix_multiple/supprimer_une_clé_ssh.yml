@@ -1,1 +1,14 @@
+- name: Supprimer une clé SSH
+  hosts: all
+  become: yes
+
+  vars:
+    username: "{{ username }}"
+
+  tasks:
+    - name: Supprimer la clé choisie
+      authorized_key:
+        user: "{{ username }}"
+        key: "{{ key_to_remove }}"
+        state: absent
 
