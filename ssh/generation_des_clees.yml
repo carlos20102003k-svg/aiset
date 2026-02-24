@@ -1,6 +1,6 @@
 ---
 - name: Création utilisateur + clé SSH
-  hosts: 192.168.100.161
+  hosts: 192.168.0.94
   become: yes
 
   vars:
@@ -8,14 +8,6 @@
     expire_date: "2026-03-01"
 
   tasks:
-
-    # 0️⃣ Installer OpenSSH si absent
-    - name: Installer OpenSSH client et server
-      package:
-        name:
-          - openssh-server 
-          - openssh-client
-        state: present
 
     # 1️⃣ Créer l'utilisateur
     - name: Créer l'utilisateur
