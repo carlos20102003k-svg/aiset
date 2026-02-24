@@ -3,7 +3,7 @@
   become: yes
 
   vars:
-    username: "user01"
+    username: "{{ username }}"   # variable AWX
 
     # Méthode multi‑ligne
     #raw_key: |
@@ -14,19 +14,10 @@
       #IXV/jysrsCI/wJcBkq3A+x52CSfjV/osPx7XdTRd/T1xnlktca0SGi3doPQ7Jp/o
       #gMAWDiMC9p7LA7aGLP+tY4bC9Ldeu325Worhy0nywypBLHQO4KmP
     
-    
-    ## Méthode sur une seule ligne (si tu veux l’utiliser directement) 
+    ## Méthode sur une seule ligne
     single_line_key: "AAAAB3NzaC1yc2EAAAADAQABAAABAQDE0Fnfvp/6zXmY18ufIGHzPfhljnL7LFxeNm4wUnTxClCA3KI8EVO0v6bzuxf6SWvgNJ1WcuTBasceQksI9vRFIwwkyYLCo9kuHu4MZkn3vfhWeFX+nn2IbqnU22ZkPXF7CJFatesiVq4iOy1HbAg6QUntxwwvin7lQAu9Zhwh9dXDufhRVJC3hBJtVTGeuP0ieofqOuy8cSE0V2Bs0Mv1b6XCfwSLUn6XIXV/jysrsCI/wJcBkq3A+x52CSfjV/osPx7XdTRd/T1xnlktca0SGi3doPQ7Jp/ogMAWDiMC9p7LA7aGLP+tY4bC9Ldeu325Worhy0nywypBLHQO4KmP"
-    
-    ##Type de clé :## 
-    #RSA=ssh-rsa
-    #ED25519=ssh-ed25519
-    #ECDSA=ecdsa-sha2-nistp256
-    #DSA (ancien)= ssh-dss
 
-    ## Choix de la clé utilisée (ici : multi‑ligne convertie en une ligne)
-    #my_public_key: "ssh-rsa {{ raw_key | replace('\n', '') }} jeankey"
-    ## Choix de la clé utilisée (ici : une ligne )
+    ## Choix de la clé utilisée
     my_public_key: "ssh-rsa {{ single_line_key }} jeankey"
     
   tasks:
@@ -50,3 +41,19 @@
         user: "{{ username }}"
         state: present
         key: "{{ my_public_key }}"
+
+    # 🔒 Sécurisation du dossier .ssh
+    - name: Mettre root propriétaire du dossier .ssh
+      file:
+        path: "/home/{{ username }}/.ssh"
+        owner: root
+        group: root
+        mode: '0755'
+
+    # 🔒 Sécurisation du fichier authorized_keys
+    - name: Mettre root propriétaire du fichier authorized_keys
+      file:
+        path: "/home/{{ username }}/.ssh/authorized_keys"
+        owner: root
+        group: root
+        mode: '0644'
