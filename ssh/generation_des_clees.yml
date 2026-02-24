@@ -4,8 +4,9 @@
   become: yes
 
   vars:
-    username: "user01"
-    expire_date: "2026-03-01"
+    username: "{{ username }}"
+    email_to: "{{ email_to }}"
+    expire_date: "{{ expire_date }}"
 
   tasks:
 
@@ -33,10 +34,10 @@
         owner: "{{ username }}"
         group: "{{ username }}"
         mode: '0600'
-        comment: "{{ username }}-expire-{{ expire_date + ' 00:00:00' }}"
+        comment: "{{ username }}-expire-{{ expire_date }} 00:00:00"
         passphrase: ""
 
-    # 4️⃣ Lire la clé publique générée (depuis la machine distante)
+    # 4️⃣ Lire la clé publique générée
     - name: Lire la clé publique générée
       slurp:
         src: "/home/{{ username }}/.ssh/id_ed25519.pub"
@@ -49,14 +50,38 @@
         state: present
         key: "{{ pubkey.content | b64decode }}"
 
-    # 6️⃣ Envoyer les clés SSH par email
+    # 6️⃣ Sécuriser le HOME (empêche suppression de .ssh)
+    - name: Sécuriser le HOME
+      file:
+        path: "/home/{{ username }}"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0755'
+
+    # 7️⃣ Sécuriser le dossier .ssh
+    - name: Sécuriser le dossier .ssh
+      file:
+        path: "/home/{{ username }}/.ssh"
+        owner: root
+        group: root
+        mode: '0755'
+
+    # 8️⃣ Sécuriser authorized_keys
+    - name: Sécuriser authorized_keys
+      file:
+        path: "/home/{{ username }}/.ssh/authorized_keys"
+        owner: root
+        group: root
+        mode: '0644'
+
+    # 9️⃣ Envoyer les clés SSH par email
     - name: Envoyer les clés SSH par email
       community.general.mail:
         host: smtp.gmail.com
         port: 587
         username: "{{ smtp_user }}"
         password: "{{ smtp_pass }}"
-        to: "jeuxtest440@gmail.com"
+        to: "{{ email_to }}"
         subject: "Clés SSH générées - {{ inventory_hostname }}"
         body: |
           Voici les clés SSH générées automatiquement pour l'utilisateur {{ username }}.
