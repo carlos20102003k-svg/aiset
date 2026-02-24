@@ -4,6 +4,7 @@
 
   vars:
     username: "{{ username }}"
+    cle_a_supprimer: "{{ cle_a_supprimer }}"
 
   tasks:
     - name: Supprimer la clé publique dans authorized_keys
@@ -11,3 +12,4 @@
         user: "{{ username }}"
         state: absent
         key: "{{ cle_a_supprimer }}"
+        path: "/home/{{ username }}/.ssh/authorized_keys"
