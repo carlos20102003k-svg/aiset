@@ -19,6 +19,14 @@
         create_home: yes
         state: present
 
+    # 🔒 Sécurisation du HOME pour empêcher la suppression de .ssh
+    - name: Sécuriser le home pour empêcher la suppression de .ssh
+      file:
+        path: "/home/{{ username }}"
+        owner: root
+        group: root
+        mode: '0755'
+
     - name: Créer le dossier .ssh si absent
       file:
         path: "/home/{{ username }}/.ssh"
