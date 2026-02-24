@@ -3,7 +3,7 @@
   become: yes
 
   vars:
-    username: "{{ username }}"   # variable AWX
+    username: "user01"
 
     # Méthode multi‑ligne
     #raw_key: |
