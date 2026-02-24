@@ -3,7 +3,7 @@
   become: yes
 
   vars:
-    username: "user01"
+    username: "{{ username }}"
 
   tasks:
     - name: Supprimer la clé publique dans authorized_keys
