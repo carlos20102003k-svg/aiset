@@ -1,0 +1,21 @@
+- name: Lire les clés SSH
+  hosts: all
+  become: yes
+
+  vars:
+    username: "{{ username }}"
+
+  tasks:
+    - name: Lire authorized_keys
+      slurp:
+        src: "/home/{{ username }}/.ssh/authorized_keys"
+      register: keys_raw
+
+    - name: Convertir en liste
+      set_fact:
+        keys_list: "{{ keys_raw.content | b64decode | split('\n') | reject('equalto','') | list }}"
+
+    - name: Exporter pour workflow
+      set_stats:
+        data:
+          ssh_keys_available: "{{ keys_list }}"
