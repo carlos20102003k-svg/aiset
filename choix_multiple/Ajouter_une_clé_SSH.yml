@@ -1,0 +1,14 @@
+- name: Ajouter une clé SSH
+  hosts: all
+  become: yes
+
+  vars:
+    username: "{{ username }}"
+    my_public_key: "ssh-rsa {{ ssh_key | regex_replace('\\s+', '') }} {{ comment }}"
+
+  tasks:
+    - name: Ajouter la clé
+      authorized_key:
+        user: "{{ username }}"
+        key: "{{ my_public_key }}"
+        state: present
