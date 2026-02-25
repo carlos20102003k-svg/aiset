@@ -1,5 +1,5 @@
 - name: Supprimer une clé SSH
-  hosts: 192.168.0.94
+  hosts: goupe_teste_clients
   become: yes
 
   vars:
