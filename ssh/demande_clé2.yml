@@ -1,0 +1,61 @@
+- name: Ajouter une clé ssh
+  hosts: goupe_teste_clients
+  become: yes
+
+  vars:
+    username: "{{ username }}"
+    ssh_key: "{{ ssh_key | trim }}"
+    key_type: "{{ key_type | default('') | trim }}"
+    key_comment: "{{ key_comment | default('') | trim }}"
+
+    # Détection automatique :
+    # Si la clé commence déjà par ssh-rsa / ssh-ed25519 → on la garde telle quelle
+    # Sinon → on reconstruit proprement
+    my_public_key: >-
+      {% if ssh_key.startswith('ssh-') %}
+        {{ ssh_key }}
+      {% else %}
+        {{ (key_type ~ ' ' if key_type else '') ~ ssh_key ~ (' ' ~ key_comment if key_comment else '') }}
+      {% endif %}
+
+  tasks:
+    - name: Créer l'utilisateur s'il n'existe pas
+      user:
+        name: "{{ username }}"
+        shell: /bin/bash
+        create_home: yes
+        state: present
+
+    - name: home appartient username
+      file:
+        path: "/home/{{ username }}"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+
+    - name: Créer le dossier .ssh si absent
+      file:
+        path: "/home/{{ username }}/.ssh"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0700'
+
+    - name: Ajouter la clé publique dans authorized_keys
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ my_public_key }}"
+
+    - name: Mettre root propriétaire du dossier .ssh
+      file:
+        path: "/home/{{ username }}/.ssh"
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Mettre root propriétaire du fichier authorized_keys
+      file:
+        path: "/home/{{ username }}/.ssh/authorized_keys"
+        owner: root
+        group: root
+        mode: '0644'
