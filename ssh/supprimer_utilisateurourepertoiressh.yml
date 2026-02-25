@@ -1,0 +1,16 @@
+# 🔥 Suppression complète de l'utilisateur + home
+- name: Supprimer l'utilisateur et son répertoire
+  user:
+    name: "{{ username }}"
+    state: absent
+    remove: yes
+  when: choix1 | bool
+
+# 🔥 Suppression du dossier .ssh uniquement
+- name: Supprimer le dossier .ssh de l'utilisateur
+  file:
+    path: "/home/{{ username }}/.ssh"
+    state: absent
+  when:
+    - not choix1 | bool        # seulement si l'utilisateur n'est PAS supprimé
+    - choix2 | bool            # seulement si choix2 = vrai
