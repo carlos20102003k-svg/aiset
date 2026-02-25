@@ -1,5 +1,5 @@
 - name: Supprimer utilisateur et/ou repertoire
-  hosts: 192.168.0.94
+  hosts: 192.168.100.161
   become: yes
   
 # 🔥 Suppression complète de l'utilisateur + home
