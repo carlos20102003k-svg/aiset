@@ -1,20 +1,28 @@
-- name: Supprimer utilisateur et/ou repertoire
+---
+- name: Suppression utilisateur ou .ssh
   hosts: 192.168.100.161
   become: yes
-  
-# 🔥 Suppression complète de l'utilisateur + home
-- name: Supprimer l'utilisateur et son répertoire
-  user:
-    name: "{{ username }}"
-    state: absent
-    remove: yes
-  when: choix1 | bool
 
-# 🔥 Suppression du dossier .ssh uniquement
-- name: Supprimer le dossier .ssh de l'utilisateur
-  file:
-    path: "/home/{{ username }}/.ssh"
-    state: absent
-  when:
-    - not choix1 | bool        # seulement si l'utilisateur n'est PAS supprimé
-    - choix2 | bool            # seulement si choix2 = vrai
+  vars:
+    username: "{{ username }}"
+    choix1: "{{ choix1 }}"
+    choix2: "{{ choix2 }}"
+
+  tasks:
+
+    # 🔥 Suppression complète de l'utilisateur + home
+    - name: Supprimer l'utilisateur et son répertoire
+      user:
+        name: "{{ username }}"
+        state: absent
+        remove: yes
+      when: choix1 | bool
+
+    # 🔥 Suppression du dossier .ssh uniquement
+    - name: Supprimer le dossier .ssh de l'utilisateur
+      file:
+        path: "/home/{{ username }}/.ssh"
+        state: absent
+      when:
+        - not choix1 | bool
+        - choix2 | bool
