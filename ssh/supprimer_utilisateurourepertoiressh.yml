@@ -10,7 +10,7 @@
 
   tasks:
 
-    # 🔥 Suppression complète de l'utilisateur + home
+    #Suppression complète de l'utilisateur + home
     - name: Supprimer l'utilisateur et son répertoire
       user:
         name: "{{ username }}"
@@ -18,7 +18,7 @@
         remove: yes
       when: choix1 | bool
 
-    # 🔥 Suppression du dossier .ssh uniquement
+    #Suppression du dossier .ssh uniquement
     - name: Supprimer le dossier .ssh de l'utilisateur
       file:
         path: "/home/{{ username }}/.ssh"
