@@ -1,6 +1,6 @@
 ---
 - name: Création utilisateur + clé SSH
-  hosts: groupe-ssh2
+  hosts: goupe_teste_clients
   become: yes
 
   vars:
